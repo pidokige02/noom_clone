@@ -1,19 +1,24 @@
-// import http from "http" // pre install package in node.js
-// import WebSocket from "ws"
-// import express from "express"
+import http from "http" // pre install package in node.js
+import WebSocket from "ws"
+import express from "express"
 
-// const app = express();
+const app = express();
 
-// app.set("view engine", "pug");
-// app.set("views", __dirname +"/views");
-// app.use("/public", express.static(__dirname + "/public"));
-// app.get("/", (_,res) => res.render("home"));
-// app.get("/*", (_,res) => res.redirect("/"));
+app.set("view engine", "pug");
+app.set("views", __dirname +"/views");
+app.use("/public", express.static(__dirname + "/public"));  //expose only public folder to the user (security reason)
+app.get("/", (_,res) => res.render("home")); // rendering template "home" for the root route .
+app.get("/*", (_,res) => res.redirect("/")); // catch all other url
 
-// const handleListen = () => console.log('Listening on http://localhost:3000')
+const handleListen = () => console.log('Listening on http://localhost:3000')
 
-// const server = http.createServer(app);      // combine http and express server. this is required for websocket.
-// const wss = new WebSocket.Server ({server}) // create http server on top of webSocket server
+// create http server from express application.
+const server = http.createServer(app);
+// create webSocket server on top of http server
+// if http server isn't required, you don't need to put "server" parameter to WebSocket.Server ({server})
+const wss = new WebSocket.Server ({server})
+
+server.listen(3000, handleListen);
 
 // function handleConnection(socket)   {
 //     console.log(socket);
@@ -24,22 +29,23 @@
 //     socket.send("hello!!!");
 // });
 
-// server.listen(3000, handleListen);
-// // app.listen(3000, handleListen);
-
-import express from "express"
-
-const app = express();
-
-//below two line set the view
-app.set("view engine", "pug");
-app.set("views", __dirname +"/views");
-app.use("/public", express.static(__dirname + "/public"));  //expose only public folder to the user (security reason)
 
 
-// it render
-app.get("/", (req,res) => res.render("home"));  // rendering template "hoot" for the root route .
-app.get("/*", (req,res) => res.redirect("/"));  // catch all other url
 
-const handleListen = () => console.log('Listening on http://localhost:3000')
-app.listen(3000, handleListen);
+// sample code for lesson #0
+// import express from "express"
+
+// const app = express();
+
+// //below two line set the view
+// app.set("view engine", "pug");
+// app.set("views", __dirname +"/views");
+// app.use("/public", express.static(__dirname + "/public"));  //expose only public folder to the user (security reason)
+
+
+// // it render
+// app.get("/", (_,res) => res.render("home"));  // rendering template "home" for the root route .
+// app.get("/*", (_,res) => res.redirect("/"));  // catch all other url
+
+// const handleListen = () => console.log('Listening on http://localhost:3000')
+// app.listen(3000, handleListen);
