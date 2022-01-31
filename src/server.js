@@ -18,16 +18,20 @@ const server = http.createServer(app);
 // if http server isn't required, you don't need to put "server" parameter to WebSocket.Server ({server})
 const wss = new WebSocket.Server ({server})
 
-server.listen(3000, handleListen);
+function handleConnection(socket)   {
+    console.log(socket);
+}
 
-// function handleConnection(socket)   {
-//     console.log(socket);
-// }
+
+wss.on("connection", handleConnection);
 
 // wss.on("connection",(socket) => {
 //     console.log("Connected to Browser😂");
 //     socket.send("hello!!!");
 // });
+
+server.listen(3000, handleListen);
+
 
 
 
