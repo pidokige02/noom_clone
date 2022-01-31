@@ -34,10 +34,12 @@ const app = express();
 //below two line set the view
 app.set("view engine", "pug");
 app.set("views", __dirname +"/views");
-app.use("/public", express.static(__dirname + "/public"));  //expose public folder th the user
+app.use("/public", express.static(__dirname + "/public"));  //expose only public folder to the user (security reason)
 
 
 // it render
-app.get("/", (req,res) => res.render("home"));  // create only root route.
+app.get("/", (req,res) => res.render("home"));  // rendering template "hoot" for the root route .
+app.get("/*", (req,res) => res.redirect("/"));  // catch all other url
+
 const handleListen = () => console.log('Listening on http://localhost:3000')
 app.listen(3000, handleListen);
