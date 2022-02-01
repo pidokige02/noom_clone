@@ -22,17 +22,20 @@ function handleConnection(socket)   {
     console.log(socket);
 }
 
+
+const sockets = [];
 // wss.on("connection", handleConnection);
 // bbelow code  is executed for each browser connected to the server
 wss.on("connection",(socket) => {
+    sockets.push(socket);  // save socket whenever new socket is established for multiple browsers.
     console.log("Connected to Browser😂");
     socket.on("close", () => {
         console.log("disconnected from the Browser✔");
     })
     socket.on("message", (message) => {
-        console.log(message.toString());
-    });
-    socket.send("hello!!!");
+        sockets.forEach(aSocket => aSocket.send(message.toString()))
+        //socket.send(message.toString()); // send back the received messaage.
+     });
 });
 
 server.listen(3000, handleListen);
