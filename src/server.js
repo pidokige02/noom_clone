@@ -25,16 +25,23 @@ function handleConnection(socket)   {
 
 const sockets = [];
 // wss.on("connection", handleConnection);
-// bbelow code  is executed for each browser connected to the server
+// below codes are executed for each browser connected to the server
 wss.on("connection",(socket) => {
     sockets.push(socket);  // save socket whenever new socket is established for multiple browsers.
+    socket["nickname"] = "Anon";
     console.log("Connected to Browser😂");
     socket.on("close", () => {
         console.log("disconnected from the Browser✔");
     })
-    socket.on("message", (message) => {
-        sockets.forEach(aSocket => aSocket.send(message.toString()))
-        //socket.send(message.toString()); // send back the received messaage.
+    socket.on("message", (msg) => {
+        const message = JSON.parse(msg);
+        switch (message.type) {
+            case "new_message":
+                sockets.forEach(aSocket =>
+                    aSocket.send(`${socket.nickname}: ${message.payload}`))
+            case "nickname":
+                socket["nickname"] = message.payload;
+        }
      });
 });
 

@@ -1,9 +1,15 @@
 // codes below are for frond end
 const messageList = document.querySelector("ul");
-const messageForm = document.querySelector("form");
+const nickForm = document.querySelector("#nick");
+const messageForm = document.querySelector("#message");
 
 //window.location.host tells us where we are this can be applicable to web and modile phone
 const socket = new WebSocket(`ws://${window.location.host}`);
+
+function makeMessage(type, payload){
+    const msg = {type, payload};    // turn data into object
+    return JSON.stringify(msg);     // turn object into string
+}
 
 // register eventlisterer function for "open", "message" and "close" event for the socket.
 socket.addEventListener("open", () =>{
@@ -11,7 +17,9 @@ socket.addEventListener("open", () =>{
 });
 
 socket.addEventListener("message", (message) =>{
-    console.log("New message: ", message.data);
+    const li = document.createElement("li");
+    li.innerText = message.data;
+    messageList.append(li);
 });
 
 socket.addEventListener("close", () =>{
@@ -26,8 +34,16 @@ socket.addEventListener("close", () =>{
 function handleSubmit(event){
     event.preventDefault();
     const input = messageForm.querySelector("input");
-    socket.send(input.value);
+    socket.send(makeMessage("new_message", input.value));
+    input.value = "";
+}
+
+function handleNickSubmit(event){
+    event.preventDefault();
+    const input = nickForm.querySelector("input");
+    socket.send(makeMessage("nickname",input.value));
     input.value = "";
 }
 
 messageForm.addEventListener("submit", handleSubmit);
+nickForm.addEventListener("submit", handleNickSubmit);
