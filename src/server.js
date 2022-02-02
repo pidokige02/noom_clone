@@ -28,13 +28,13 @@ const sockets = [];
 // below codes are executed for each browser connected to the server
 wss.on("connection",(socket) => {
     sockets.push(socket);  // save socket whenever new socket is established for multiple browsers.
-    socket["nickname"] = "Anon";
+    socket["nickname"] = "Anon"; // runtime creation of object property named as nickname
     console.log("Connected to Browser😂");
     socket.on("close", () => {
         console.log("disconnected from the Browser✔");
     })
     socket.on("message", (msg) => {
-        const message = JSON.parse(msg);
+        const message = JSON.parse(msg); // parse string into object.
         switch (message.type) {
             case "new_message":
                 sockets.forEach(aSocket =>
