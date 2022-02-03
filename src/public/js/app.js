@@ -7,6 +7,14 @@ const room = document.getElementById("room");
 room.hidden = true;
 let roomName;
 
+function addMessage(message){
+    const ul = room.querySelector("ul");
+    const li = document.createElement("li");
+    li.innerText = message;
+    ul.appendChild(li);
+}
+
+
 function showRoom(msg) {
     welcome.hidden = true;
     room.hidden = false;
@@ -17,13 +25,24 @@ function showRoom(msg) {
 function handleRoomSubmit(event){
     event.preventDefault();
     const input = form.querySelector("input");
-    socket.emit("enter_room", {payload:input.value}, showRoom); // "room" is event name, socket.io can send object directly.
+    // socket.emit("enter_room", {payload:input.value}, showRoom); // not working w/ socket.to(roomName).emit("welcome");
+    socket.emit("enter_room", input.value, showRoom); // "enter_room" is event name, socket.io can send object directly.
     roomName = input.value;
     input.value = "";
 }
 
 form.addEventListener("submit", handleRoomSubmit);
 
+//Socket Code
+socket.on("welcome", () => {
+    console.log("welcome");
+    addMessage("someone joined!");
+});
+
+socket.on("bye", () => {
+    console.log("bye");
+    addMessage("someone left ㅠㅠ");
+});
 
 
 

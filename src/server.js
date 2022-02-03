@@ -18,14 +18,18 @@ wsServer.on ("connection", (socket) =>{
         console.log(`Socket Event:${event}`);  // tiny spy code
     });
     socket.on("enter_room",(roomName, done) =>{
-        // console.log(socket.id);
-        // console.log(socket.rooms);  //Set(1) { 'zbdmMbOdDQXVSb0iAAAD' }
+        //console.log(socket.rooms);  //Set(1) { 'zbdmMbOdDQXVSb0iAAAD' }
         socket.join(roomName);
-        // console.log(socket.rooms);  //Set(2) { 'zbdmMbOdDQXVSb0iAAAD', { payload: '1212' } }
-        done();
+        //console.log(socket.rooms);  //Set(2) { 'zbdmMbOdDQXVSb0iAAAD', { payload: '1212' } }
+        done();                     // callback function named showRoom from app.js
+        socket.to(roomName).emit("welcome");  // send welcome event to everybody in the room except myself
+
         // setTimeout(() => {
         //     done("hello from the backend");
         // },15000);
+    });
+    socket.on("disconnecting", () => {
+        socket.rooms.forEach((room) => socket.to(room).emit("bye")); //
     });
 });
 
