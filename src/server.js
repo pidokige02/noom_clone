@@ -14,11 +14,18 @@ const httpServer = http.createServer(app);
 const wsServer = SocketIO(httpServer);
 
 wsServer.on ("connection", (socket) =>{
-    socket.on("room",(msg, done) =>{
-        console.log(msg);
-        setTimeout(() => {
-            done();
-        },10000);
+    socket.onAny((event) => {
+        console.log(`Socket Event:${event}`);  // tiny spy code
+    });
+    socket.on("enter_room",(roomName, done) =>{
+        // console.log(socket.id);
+        // console.log(socket.rooms);  //Set(1) { 'zbdmMbOdDQXVSb0iAAAD' }
+        socket.join(roomName);
+        // console.log(socket.rooms);  //Set(2) { 'zbdmMbOdDQXVSb0iAAAD', { payload: '1212' } }
+        done();
+        // setTimeout(() => {
+        //     done("hello from the backend");
+        // },15000);
     });
 });
 
