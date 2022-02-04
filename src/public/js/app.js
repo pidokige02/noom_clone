@@ -100,24 +100,25 @@ camerasSelect.addEventListener("input", handleCameraChange);
 const welcome  = document.getElementById("welcome");
 const welcomeForm = welcome.querySelector("form");
 
-async function startMedia(){
+async function initCall(){
     welcome.hidden = true;
     call.hidden = false;
     await getMedia();
     makeConnection();
 }
 
-function handleWelcomeSubmit(event){
+async function handleWelcomeSubmit(event){
     event.preventDefault();
     const input = welcomeForm.querySelector("input");
-    socket.emit("join_room", input.value, startMedia);
+    await initCall();
+    socket.emit("join_room", input.value);
     roomName = input.value;  // save the roomName for the later usages
     input.value = "";
 }
 
 welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 
-socket.on("welcome", async () => {  // runing on peer A
+socket.on("welcome", async () => {      // runing on peer A
     const offer = await myPeerConnection.createOffer();
     myPeerConnection.setLocalDescription(offer);
     console.log("sent the offer")
@@ -126,8 +127,20 @@ socket.on("welcome", async () => {  // runing on peer A
 
 
 socket.on("offer", async (offer) => { // run on peer B
-    console.log("receive the offer")
-    console.log(offer);
+    console.log("received the offer")
+    myPeerConnection.setRemoteDescription(offer);
+    // ping pong communication 이너무 빨라서 myPeerConnection 이 undefined 되었다는 error가 발생함
+    // 해사 refactring 이 발생함 w/ initcall
+    const answer = await myPeerConnection.createAnswer();
+    myPeerConnection.setLocalDescription(answer);
+    socket.emit("answer", answer, roomName);
+    console.log("sent the answer");
+});
+
+
+socket.on("answer", (answer) => {   // runing on peer A
+    console.log("received the answer");
+    myPeerConnection.setRemoteDescription(answer);
   });
 
 
