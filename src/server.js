@@ -1,5 +1,6 @@
 import http from "http" // pre install package in node.js
-import SocketIO from "socket.io";
+import { Server } from "socket.io";
+import { instrument } from "@socket.io/admin-ui";
 import express from "express"
 
 const app = express();
@@ -11,7 +12,16 @@ app.get("/", (_,res) => res.render("home")); // rendering template "home" for th
 app.get("/*", (_,res) => res.redirect("/")); // catch all other url
 
 const httpServer = http.createServer(app);
-const wsServer = SocketIO(httpServer);
+const wsServer = new Server(httpServer, {   // added for socket.io admin
+    cors: {
+      origin: ["https://admin.socket.io"],
+      credentials: true
+    }
+});
+
+instrument(wsServer, {
+    auth: false
+});
 
 function publicRooms(){
         const {
@@ -57,8 +67,7 @@ wsServer.on ("connection", (socket) =>{
         wsServer.sockets.emit("room_change",publicRooms()); // send a message to all socket
     });
 
-
-    socket.on("new_message", (msg, room, done) => {
+    socket.on("new_message", (msg, room, done) => {     // done is passed from the frontend
         socket.to(room).emit("new_message", `${socket.nickname}: ${msg}`);
         done();
     });
