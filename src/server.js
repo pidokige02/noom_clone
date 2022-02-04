@@ -28,6 +28,10 @@ function publicRooms(){
     return publicRooms;
 }
 
+function countRoom(roomName){
+    return wsServer.sockets.adapter.rooms.get(roomName)?.size;
+}
+
 wsServer.on ("connection", (socket) =>{
     socket['nickname'] = "Amno";
     socket.onAny((event) => {
@@ -39,14 +43,14 @@ wsServer.on ("connection", (socket) =>{
         socket.join(roomName);
         //console.log(socket.rooms);  //Set(2) { 'zbdmMbOdDQXVSb0iAAAD', { payload: '1212' } }
         done();                     // callback function named showRoom from app.js
-        socket.to(roomName).emit("welcome", socket.nickname);  // send welcome event to everybody in the room except myself
+        socket.to(roomName).emit("welcome", socket.nickname, countRoom(roomName));  // send welcome event to everybody in the room except myself
         wsServer.sockets.emit("room_change",publicRooms()); // send a message to all socket
         // setTimeout(() => {
         //     done("hello from the backend");
         // },15000);
     });
     socket.on("disconnecting", () => {
-        socket.rooms.forEach((room) => socket.to(room).emit("bye",socket.nickname)); //
+        socket.rooms.forEach((room) => socket.to(room).emit("bye",socket.nickname, countRoom(room) -1 )); //
     });
 
     socket.on("disconnect", () => {
