@@ -32,7 +32,6 @@ function handleNicknameSubmit(event){
     input.value = "";
 }
 
-
 function showRoom(msg) {
     welcome.hidden = true;
     room.hidden = false;
@@ -67,7 +66,20 @@ socket.on("bye", (left) => {
 // socket.on("new_message", (msg) => addMessage(msg));
 socket.on("new_message", addMessage);
 
-
+//socket.on("room_change", (msg) => console.log(msg));
+//socket.on("room_change", console.log);
+socket.on("room_change", (rooms) => {
+    const roomList = welcome.querySelector("ul");
+    roomList.innerHTML = "";
+    if(rooms.llength === 0){
+        return;
+    }
+    rooms.forEach(room => {
+        const li = document.createElement("li");
+        li.innerText = room;
+        roomList.append(li);
+    });
+});
 
 
 
