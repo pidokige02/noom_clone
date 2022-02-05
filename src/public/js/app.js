@@ -14,6 +14,7 @@ let muted = false;
 let cameraOff = false;
 let roomName;
 let myPeerConnection;
+let myDataChannel;
 
 async function getCameras() {
     try{
@@ -126,6 +127,9 @@ async function handleWelcomeSubmit(event){
 welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 
 socket.on("welcome", async () => {      // runing on peer A
+    myDataChannel = myPeerConnection.createDataChannel("chat");
+    myDataChannel.addEventListener("message", (event) => console.log(event.data));
+    console.log("made data channel");
     const offer = await myPeerConnection.createOffer();
     myPeerConnection.setLocalDescription(offer);
     console.log("sent the offer")
@@ -134,6 +138,12 @@ socket.on("welcome", async () => {      // runing on peer A
 
 
 socket.on("offer", async (offer) => { // run on peer B
+    myPeerConnection.addEventListener("datachannel", (event) => {
+        myDataChannel = event.channel;
+        myDataChannel.addEventListener("message", (event) =>
+          console.log(event.data)
+        );
+    });
     console.log("received the offer")
     myPeerConnection.setRemoteDescription(offer);
     // ping pong communication 이너무 빨라서 myPeerConnection 이 undefined 되었다는 error가 발생함
