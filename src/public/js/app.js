@@ -88,9 +88,13 @@ function handleCameraClick(){
 
 async function handleCameraChange(){
     await getMedia(camerasSelect.value);
-    // if (myPeerConnection)  {
-    //     console.log(myPeerConnection.getSenders());
-    // }
+    if (myPeerConnection) {
+        const videoTrack = myStream.getVideoTracks()[0];
+        const videoSender = myPeerConnection
+          .getSenders()
+          .find((sender) => sender.track.kind === "video");
+        videoSender.replaceTrack(videoTrack);
+      }
 }
 
 muteBtn.addEventListener("click", handlemMuteClick);
@@ -133,7 +137,7 @@ socket.on("offer", async (offer) => { // run on peer B
     console.log("received the offer")
     myPeerConnection.setRemoteDescription(offer);
     // ping pong communication 이너무 빨라서 myPeerConnection 이 undefined 되었다는 error가 발생함
-    // 해사 refactring 이 발생함 w/ initcall
+    // therefore, refactring 이 발생함 w/ initcall
     const answer = await myPeerConnection.createAnswer();
     myPeerConnection.setLocalDescription(answer);
     socket.emit("answer", answer, roomName);
